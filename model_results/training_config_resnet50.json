@@ -1,0 +1,20 @@
+{
+  "img_size": [
+    224,
+    224
+  ],
+  "batch_size": 16,
+  "architecture": "ResNet50",
+  "fine_tune_layers": 30,
+  "class_names": [
+    "Bird-drop",
+    "Clean",
+    "Dusty",
+    "Electrical-damage",
+    "Physical-Damage",
+    "Snow-Covered"
+  ],
+  "dataset_dir": "/content/drive/MyDrive/COMPONENTE PRÁCTICO 2 GRUPO#6/dataset",
+  "best_model_path": "/content/drive/MyDrive/COMPONENTE PRÁCTICO 2 GRUPO#6/resultados/resnet50/best_resnet50_paneles_6clases.keras",
+  "final_model_path": "/content/drive/MyDrive/COMPONENTE PRÁCTICO 2 GRUPO#6/resultados/resnet50/resnet50_paneles_6clases_final.keras"
+}
