@@ -1,0 +1,60 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Clasificador académico de condiciones visibles en paneles solares">
+    <meta name="theme-color" content="#F5F5F7">
+    <title>{% block title %}Inspector solar{% endblock %}</title>
+    <link rel="icon" type="image/svg+xml" href="{% static 'predictor/icons/solar-mark.svg' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'predictor/icons/favicon-32x32.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'predictor/icons/apple-touch-icon.png' %}">
+    <link rel="stylesheet" href="{% static 'predictor/css/styles.css' %}">
+    <script src="{% static 'predictor/js/upload.js' %}" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Saltar al contenido</a>
+
+    <header class="global-header" data-header>
+        <nav class="nav-container" aria-label="Navegación principal">
+            <a class="brand" href="{% url 'predictor:home' %}" aria-label="Inspector solar, ir al inicio">
+                <img src="{% static 'predictor/icons/solar-mark.svg' %}" width="30" height="30" alt="">
+                <span>Inspector solar</span>
+            </a>
+
+            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Abrir menú">
+                <span></span><span></span>
+            </button>
+
+            <div class="nav-links" id="primary-navigation">
+                <a href="{% url 'predictor:home' %}"{% if request.resolver_match.url_name == 'home' %} aria-current="page"{% endif %}>Inicio</a>
+                <a href="{% url 'predictor:home' %}#como-funciona">Cómo funciona</a>
+                <a href="{% url 'predictor:model_info' %}"{% if request.resolver_match.url_name == 'model_info' %} aria-current="page"{% endif %}>Modelo</a>
+                <a class="nav-action" href="{% url 'predictor:home' %}#analizar">Analizar imagen</a>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="global-footer">
+        <div class="footer-container">
+            <div>
+                <a class="footer-brand" href="{% url 'predictor:home' %}">Inspector solar</a>
+                <p>Proyecto académico de Inteligencia Artificial · Universidad Estatal de Milagro</p>
+            </div>
+            <nav aria-label="Navegación del pie de página">
+                <a href="{% url 'predictor:home' %}">Inicio</a>
+                <a href="{% url 'predictor:model_info' %}">Modelo</a>
+            </nav>
+        </div>
+        <div class="footer-legal">
+            <span>© {% now "Y" %} Inspector solar</span>
+            <span>No reemplaza una inspección técnica profesional.</span>
+        </div>
+    </footer>
+</body>
+</html>

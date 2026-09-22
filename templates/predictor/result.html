@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load l10n %}
+
+{% block title %}{{ result.display_name }} | Inspector solar{% endblock %}
+
+{% block content %}
+<section class="result-page section-pad tone-context-{{ result.result_tone }}">
+    <div class="content-container">
+        <nav class="breadcrumb" aria-label="Ruta de navegación" data-reveal>
+            <a href="{% url 'predictor:home' %}">Inicio</a><span aria-hidden="true">/</span><span>Resultado</span>
+        </nav>
+
+        <div class="result-hero">
+            <figure class="analyzed-figure" data-reveal>
+                <figcaption><span></span> Imagen analizada</figcaption>
+                <div class="analyzed-image-frame">
+                    <img src="{{ preview_data_url }}" alt="Vista completa del panel solar analizado">
+                </div>
+            </figure>
+
+            <section class="result-summary" aria-labelledby="result-title" data-reveal>
+                <div class="result-status">
+                    <span class="status-dot" aria-hidden="true"></span>
+                    {{ result.confidence_level }}
+                </div>
+                <p class="overline">Condición principal</p>
+                <h1 id="result-title">{{ result.display_name }}</h1>
+                <div class="confidence-line">
+                    <strong>{{ result.confidence_percentage|floatformat:2 }}%</strong>
+                    <span>de confianza</span>
+                </div>
+                <p class="technical-class">Clase técnica · <code>{{ result.technical_class }}</code></p>
+
+                <div class="result-copy">
+                    <div><h2>Lectura visual</h2><p>{{ result.description }}</p></div>
+                    <div><h2>Recomendación</h2><p>{{ result.recommendation }}</p></div>
+                </div>
+
+                {% if result.is_low_confidence %}
+                <div class="low-confidence-note" role="status">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 1.7 20h20.6L12 2Zm0 4.03L18.85 18H5.15L12 6.03ZM11 9v5h2V9h-2Zm0 6.5v2h2v-2h-2Z"/></svg>
+                    <p>{{ result.low_confidence_message }}</p>
+                </div>
+                {% endif %}
+
+                <a class="primary-button result-action" href="{% url 'predictor:home' %}#analizar">Analizar otra imagen</a>
+                <p class="calibration-note">Los niveles de confianza son una regla de presentación, no una calibración científica.</p>
+            </section>
+        </div>
+
+        <section class="probabilities-section" aria-labelledby="probabilities-title" data-reveal>
+            <div class="section-heading split-heading">
+                <div><p class="overline">Distribución completa</p><h2 id="probabilities-title">Probabilidades por condición</h2></div>
+                <p>Valores reales del modelo, ordenados de mayor a menor.</p>
+            </div>
+
+            <ol class="probability-list">
+                {% for item in result.probabilities %}
+                <li class="probability-row{% if item.is_winner %} is-winner{% endif %}">
+                    <div class="probability-rank" aria-hidden="true">0{{ forloop.counter }}</div>
+                    <div class="probability-label">
+                        <strong>{{ item.display_name }}{% if item.is_winner %}<span>Principal</span>{% endif %}</strong>
+                        <small>{{ item.technical_class }}</small>
+                    </div>
+                    <div class="probability-track">
+                        <progress class="probability-meter" value="{{ item.bar_percentage|unlocalize }}" data-probability="{{ item.bar_percentage|unlocalize }}" max="100" aria-label="Probabilidad de {{ item.display_name }}: {{ item.percentage|floatformat:2 }} por ciento">{{ item.percentage|floatformat:2 }}%</progress>
+                    </div>
+                    <div class="probability-value">{{ item.percentage|floatformat:2 }}%</div>
+                </li>
+                {% endfor %}
+            </ol>
+        </section>
+
+        <aside class="academic-notice" role="note" data-reveal>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 3 5.5V12c0 5.05 3.42 8.42 9 10 5.58-1.58 9-4.95 9-10V5.5L12 2Zm0 2.15 7 2.72V12c0 3.95-2.5 6.65-7 7.92C7.5 18.65 5 15.95 5 12V6.87l7-2.72Z"/></svg>
+            <div><strong>Alcance del resultado</strong><p>{{ result.academic_notice }}</p></div>
+        </aside>
+    </div>
+</section>
+{% endblock %}

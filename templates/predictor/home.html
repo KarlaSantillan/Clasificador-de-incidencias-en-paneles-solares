@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Inspector solar | Analizar panel{% endblock %}
+
+{% block content %}
+<section class="home-hero section-pad">
+    <div class="content-container hero-grid">
+        <div class="hero-copy" data-reveal>
+            <p class="overline"><span></span> Clasificación visual con ResNet50</p>
+            <h1>Analiza la condición visible de tu panel con una lectura clara.</h1>
+            <p class="hero-intro">
+                Selecciona una fotografía y revisa qué patrones reconoce el modelo,
+                junto con la probabilidad asignada a cada condición.
+            </p>
+
+            <dl class="hero-facts" aria-label="Características principales">
+                <div><dt>6</dt><dd>condiciones</dd></div>
+                <div><dt>ResNet50</dt><dd>arquitectura</dd></div>
+                <div><dt>Segundos</dt><dd>para analizar</dd></div>
+            </dl>
+
+            <p class="academic-inline">
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.25 17 5v4.72c0 4.05-2.75 6.75-7 8.03-4.25-1.28-7-3.98-7-8.03V5l7-2.75Zm0 2.02L4.75 6.3v3.42c0 3.06 1.91 5.1 5.25 6.23 3.34-1.13 5.25-3.17 5.25-6.23V6.3L10 4.27Z"/></svg>
+                Herramienta académica; no sustituye una inspección profesional.
+            </p>
+        </div>
+
+        <div class="upload-panel" id="analizar" data-reveal>
+            <div class="upload-panel__heading">
+                <div>
+                    <p class="overline">Nueva evaluación</p>
+                    <h2>Imagen del panel</h2>
+                </div>
+                <span class="format-pill">JPG · PNG · WEBP</span>
+            </div>
+
+            <form id="analysis-form" method="post" action="{% url 'predictor:analyze' %}" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="form-alert" role="alert" tabindex="-1">
+                    {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+                </div>
+                {% endif %}
+
+                <div id="drop-zone" class="drop-zone{% if form.image.errors %} has-error{% endif %}">
+                    {{ form.image }}
+                    <label class="drop-zone__label" for="{{ form.image.id_for_label }}">
+                        <span class="upload-symbol" aria-hidden="true">
+                            <svg viewBox="0 0 32 32"><path d="M7 4.75h18A2.25 2.25 0 0 1 27.25 7v18A2.25 2.25 0 0 1 25 27.25H7A2.25 2.25 0 0 1 4.75 25V7A2.25 2.25 0 0 1 7 4.75Zm0 2A.25.25 0 0 0 6.75 7v13.55l5.13-5.13a2.25 2.25 0 0 1 3.18 0l2.13 2.13 1.76-1.76a2.25 2.25 0 0 1 3.18 0l3.12 3.12V7a.25.25 0 0 0-.25-.25H7Zm18.25 15-4.53-4.54a.25.25 0 0 0-.36 0l-1.76 1.76 2.28 2.28-1.42 1.41-5.81-5.82a.25.25 0 0 0-.36 0l-6.54 6.54V25c0 .14.11.25.25.25h18a.25.25 0 0 0 .25-.25v-3.25ZM11 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 2a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z"/></svg>
+                        </span>
+                        <strong>Arrastra una imagen del panel</strong>
+                        <span>o selecciónala desde tu dispositivo</span>
+                        <small>{{ allowed_formats }} · máximo {{ maximum_size }}</small>
+                    </label>
+
+                    <div class="selected-file" id="selected-file" hidden>
+                        <div class="selected-file__preview">
+                            <img id="image-preview" alt="Vista previa de la imagen seleccionada">
+                        </div>
+                        <div class="selected-file__info">
+                            <strong id="file-name"></strong>
+                            <span id="file-size"></span>
+                        </div>
+                        <div class="selected-file__actions">
+                            <label class="text-button" for="{{ form.image.id_for_label }}">Cambiar</label>
+                            <button class="text-button text-button--danger" id="remove-file" type="button">Quitar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="upload-errors" aria-live="polite">
+                    {% for error in form.image.errors %}<p>{{ error }}</p>{% endfor %}
+                    <p id="client-file-error" hidden></p>
+                </div>
+
+                <button id="submit-button" class="primary-button analyze-button" type="submit" disabled>
+                    <span class="button-label">Analizar panel</span>
+                    <span class="processing-label" hidden><span class="spinner" aria-hidden="true"></span> Analizando imagen</span>
+                </button>
+                <p class="processing-copy" id="processing-status" aria-live="polite" hidden>
+                    El modelo está evaluando los patrones visuales del panel.
+                </p>
+            </form>
+        </div>
+    </div>
+</section>
+
+<section class="how-section section-pad" id="como-funciona" aria-labelledby="how-title">
+    <div class="content-container" data-reveal>
+        <div class="section-heading split-heading">
+            <div>
+                <p class="overline">Proceso</p>
+                <h2 id="how-title">Tres pasos, una lectura comprensible.</h2>
+            </div>
+            <p>La imagen se procesa en memoria y no queda almacenada en la aplicación.</p>
+        </div>
+
+        <ol class="process-sequence">
+            <li><span>01</span><div><h3>Selecciona una fotografía</h3><p>Usa una toma enfocada y con la superficie visible.</p></div></li>
+            <li><span>02</span><div><h3>El modelo analiza sus patrones</h3><p>ResNet50 compara la imagen con las seis categorías aprendidas.</p></div></li>
+            <li><span>03</span><div><h3>Revisa el resultado</h3><p>Consulta la condición principal y la distribución completa.</p></div></li>
+        </ol>
+    </div>
+</section>
+
+<section class="conditions-section section-pad" aria-labelledby="conditions-title">
+    <div class="content-container">
+        <div class="section-heading" data-reveal>
+            <p class="overline">Categorías</p>
+            <h2 id="conditions-title">Condiciones que reconoce el modelo.</h2>
+            <p>Seis clases visuales, conservadas en el mismo orden utilizado durante el entrenamiento.</p>
+        </div>
+
+        <div class="conditions-grid">
+            <article class="condition-item" data-reveal><span class="condition-icon tone-amber"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 4.5c2.3 0 3.1 1.55 3.83 2.92.65 1.2 1.21 2.23 2.67 2.23 1.88 0 2.66-1.65 3.32-3.04.59-1.25 1.15-2.43 2.68-2.43v2c-.27 0-.55.53-.87 1.2C17.4 8.93 16.3 11.65 13 11.65c-2.65 0-3.7-1.93-4.43-3.27C7.88 7.1 7.53 6.5 6.5 6.5v-2ZM4 14h16v2H4v-2Zm3 4h10v2H7v-2Z"/></svg></span><div><h3>Excremento de aves</h3><p>Residuos localizados sobre la superficie.</p></div></article>
+            <article class="condition-item" data-reveal><span class="condition-icon tone-green"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.3 16.6-4.2-4.2 1.4-1.4 2.8 2.8 8.2-8.2L19 7 9.3 16.6Z"/><path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-2.34-5.66l1.42-1.42A9.97 9.97 0 0 0 12 2Z"/></svg></span><div><h3>Panel limpio</h3><p>Superficie sin obstrucciones visibles relevantes.</p></div></article>
+            <article class="condition-item" data-reveal><span class="condition-icon tone-amber"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v2H4V6Zm2 5h12v2H6v-2Zm3 5h6v2H9v-2Z"/><circle cx="4" cy="17" r="1.5"/><circle cx="19" cy="16" r="1"/></svg></span><div><h3>Panel cubierto de polvo</h3><p>Acumulación difusa de partículas sobre el panel.</p></div></article>
+            <article class="condition-item" data-reveal><span class="condition-icon tone-orange"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.1 2 5 13h6l-.9 9L19 10h-6l.1-8Zm1.98 10-2.3 3.12.31-4.12H8.94l2.18-3 .03 4h3.93Z"/></svg></span><div><h3>Daño eléctrico visible</h3><p>Patrones asociados con alteraciones eléctricas visibles.</p></div></article>
+            <article class="condition-item" data-reveal><span class="condition-icon tone-red"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v16H3V4Zm2 2v12h14V6H5Zm6.1 1.4 1.65 3.1-1.45 1.7 1.7 4.4-2.05-3.5 1.15-1.9-1-3.2Z"/></svg></span><div><h3>Daño físico</h3><p>Grietas, roturas u otras alteraciones estructurales.</p></div></article>
+            <article class="condition-item" data-reveal><span class="condition-icon tone-blue-gray"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 2h2v5.27l4.56-2.63 1 1.73L14 9l4.56 2.63-1 1.74L13 10.73V16h-2v-5.27l-4.56 2.64-1-1.74L10 9 5.44 6.37l1-1.73L11 7.27V2Z"/><path d="M4 18h16v2H4v-2Z"/></svg></span><div><h3>Panel cubierto de nieve</h3><p>Cobertura blanca compatible con acumulación de nieve.</p></div></article>
+        </div>
+    </div>
+</section>
+
+<section class="model-cta section-pad">
+    <div class="content-container model-cta__inner" data-reveal>
+        <div><p class="overline">Transparencia</p><h2>Conoce cómo fue evaluado el modelo.</h2></div>
+        <a class="secondary-button" href="{% url 'predictor:model_info' %}">Ver arquitectura y métricas <span aria-hidden="true">→</span></a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Modelo ResNet50 | Inspector solar{% endblock %}
+
+{% block content %}
+<section class="model-hero section-pad">
+    <div class="content-container model-hero__grid">
+        <div data-reveal>
+            <p class="overline"><span></span> Acerca del modelo</p>
+            <h1>Arquitectura y resultados, presentados con claridad.</h1>
+            <p>Esta página resume la configuración de entrenamiento y las métricas registradas para el clasificador utilizado por la aplicación.</p>
+        </div>
+        <div class="model-principle" data-reveal>
+            <span>ResNet50</span>
+            <p>Transfer learning y fine-tuning sobre imágenes de condiciones visibles en paneles fotovoltaicos.</p>
+        </div>
+    </div>
+</section>
+
+{% if metrics %}
+<section class="model-stats section-pad-sm">
+    <div class="content-container stats-grid" data-reveal>
+        <div><strong>{{ metrics.architecture }}</strong><span>Arquitectura</span></div>
+        <div><strong>{{ metrics.image_size.0 }} × {{ metrics.image_size.1 }}</strong><span>Entrada RGB</span></div>
+        <div><strong>{{ metrics.class_count }}</strong><span>Clases</span></div>
+        <div><strong>{{ metrics.test_accuracy|floatformat:2 }}%</strong><span>Exactitud de prueba</span></div>
+        <div><strong>{{ metrics.test_loss|floatformat:4 }}</strong><span>Pérdida de prueba</span></div>
+    </div>
+</section>
+
+<section class="training-section section-pad" aria-labelledby="training-title">
+    <div class="content-container training-grid">
+        <div class="section-heading" data-reveal>
+            <p class="overline">Entrenamiento</p>
+            <h2 id="training-title">PV Panel Defect Dataset</h2>
+            <p>El conjunto se dividió en entrenamiento, validación y prueba. Se aplicó transferencia de aprendizaje y un ajuste fino de las últimas {{ metrics.fine_tune_layers }} capas.</p>
+        </div>
+        <dl class="dataset-split" data-reveal>
+            <div><dt>604</dt><dd>Entrenamiento</dd></div>
+            <div><dt>127</dt><dd>Validación</dd></div>
+            <div><dt>138</dt><dd>Prueba</dd></div>
+            <div class="dataset-total"><dt>869</dt><dd>Total de imágenes</dd></div>
+        </dl>
+    </div>
+</section>
+
+<section class="charts-section section-pad" aria-labelledby="charts-title">
+    <div class="content-container">
+        <div class="section-heading split-heading" data-reveal>
+            <div><p class="overline">Evidencia visual</p><h2 id="charts-title">Comportamiento y evaluación</h2></div>
+            <p>Gráficos originales generados durante la evaluación del modelo.</p>
+        </div>
+        <div class="charts-grid">
+            <figure class="chart-figure chart-figure--wide" data-reveal>
+                <img src="{% url 'predictor:model_result_image' 'curvas-entrenamiento' %}" alt="Curvas de exactitud y pérdida durante el entrenamiento de ResNet50" loading="lazy">
+                <figcaption><strong>Curvas de entrenamiento</strong><span>Evolución de exactitud y pérdida por época.</span></figcaption>
+            </figure>
+            <figure class="chart-figure" data-reveal>
+                <img src="{% url 'predictor:model_result_image' 'matriz-confusion' %}" alt="Matriz de confusión del modelo ResNet50 para las seis clases" loading="lazy">
+                <figcaption><strong>Matriz de confusión</strong><span>Predicciones de prueba frente a las clases reales.</span></figcaption>
+            </figure>
+        </div>
+    </div>
+</section>
+
+<section class="metrics-section section-pad" aria-labelledby="metrics-title">
+    <div class="content-container">
+        <div class="section-heading" data-reveal>
+            <p class="overline">Reporte de clasificación</p>
+            <h2 id="metrics-title">Métricas por condición</h2>
+            <p>Precision, recall y F1-score proceden directamente de <code>classification_report_resnet50.csv</code>.</p>
+        </div>
+        <div class="table-scroll" data-reveal tabindex="0" role="region" aria-label="Tabla de métricas por clase">
+            <table class="metrics-table">
+                <thead><tr><th scope="col">Clase</th><th scope="col">Precision</th><th scope="col">Recall</th><th scope="col">F1-score</th><th scope="col">Support</th></tr></thead>
+                <tbody>
+                    {% for row in metrics.class_rows %}
+                    <tr><th scope="row"><strong>{{ row.display_name }}</strong><small>{{ row.technical_class }}</small></th><td>{{ row.precision|floatformat:2 }}%</td><td>{{ row.recall|floatformat:2 }}%</td><td>{{ row.f1_score|floatformat:2 }}%</td><td>{{ row.support }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% else %}
+<section class="section-pad"><div class="content-container"><div class="form-alert" role="alert"><p>No fue posible mostrar las métricas en este momento.</p></div></div></section>
+{% endif %}
+
+<section class="model-bottom-cta section-pad">
+    <div class="content-container model-cta__inner" data-reveal>
+        <div><p class="overline">Prueba el flujo</p><h2>Analiza una fotografía del panel.</h2></div>
+        <a class="primary-button" href="{% url 'predictor:home' %}#analizar">Ir al análisis <span aria-hidden="true">→</span></a>
+    </div>
+</section>
+{% endblock %}
