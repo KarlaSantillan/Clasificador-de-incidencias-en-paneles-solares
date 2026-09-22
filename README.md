@@ -2,6 +2,8 @@
 
 Aplicación web académica desarrollada con Django para clasificar condiciones visibles en paneles solares mediante un modelo ResNet50 entrenado con TensorFlow y Keras.
 
+Proyecto desarrollado para la clasificación de incidencias en paneles solares.
+
 > Este sistema realiza clasificación de imágenes. Su resultado no sustituye una inspección técnica profesional ni determina la ubicación exacta de un daño.
 
 ## 1. Descripción y problema abordado
